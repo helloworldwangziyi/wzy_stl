@@ -1,0 +1,11 @@
+# ninja log v6
+1	29	1750918858551023771	CMakeFiles/wzy_stl.dir/src/temp.cpp.o	4935d9d6815476f5
+1	105	1750919018911293053	build.ninja	cb54366b06bcd4e7
+1	409	1750918858551281144	CMakeFiles/wzy_stl_test.dir/test/test_deque.cpp.o	c1c7d298a87ab36e
+1	105	1750919018910590140	/Users/wangziyi/Desktop/test_cpp/wzy_stl/build/cmake_install.cmake	cb54366b06bcd4e7
+29	96	1750918858579611004	libwzy_stl.a	faa57d8858510230
+410	511	1750918858960203236	wzy_stl_test	626d2f2dc9faa648
+1	416	1750919019773984389	CMakeFiles/test_deque.dir/test/test_deque.cpp.o	c26e1d374ce8fe5a
+1	418	1750919019774284554	CMakeFiles/test_vector.dir/test/test_vector.cpp.o	180aae8127181998
+418	459	1750919020191676020	/Users/wangziyi/Desktop/test_cpp/wzy_stl/bin/test_vector	f91692a97e541d51
+417	459	1750919020190648317	/Users/wangziyi/Desktop/test_cpp/wzy_stl/bin/test_deque	c9befe8c7374b404

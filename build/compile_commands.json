@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/Users/wangziyi/Desktop/test_cpp/wzy_stl/build",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++ -I/Users/wangziyi/Desktop/test_cpp/wzy_stl/src -g -std=gnu++20 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -o CMakeFiles/wzy_stl.dir/src/temp.cpp.o -c /Users/wangziyi/Desktop/test_cpp/wzy_stl/src/temp.cpp",
+  "file": "/Users/wangziyi/Desktop/test_cpp/wzy_stl/src/temp.cpp",
+  "output": "CMakeFiles/wzy_stl.dir/src/temp.cpp.o"
+},
+{
+  "directory": "/Users/wangziyi/Desktop/test_cpp/wzy_stl/build",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++ -I/Users/wangziyi/Desktop/test_cpp/wzy_stl/src -g -std=gnu++20 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -o CMakeFiles/test_deque.dir/test/test_deque.cpp.o -c /Users/wangziyi/Desktop/test_cpp/wzy_stl/test/test_deque.cpp",
+  "file": "/Users/wangziyi/Desktop/test_cpp/wzy_stl/test/test_deque.cpp",
+  "output": "CMakeFiles/test_deque.dir/test/test_deque.cpp.o"
+},
+{
+  "directory": "/Users/wangziyi/Desktop/test_cpp/wzy_stl/build",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++ -I/Users/wangziyi/Desktop/test_cpp/wzy_stl/src -g -std=gnu++20 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -o CMakeFiles/test_vector.dir/test/test_vector.cpp.o -c /Users/wangziyi/Desktop/test_cpp/wzy_stl/test/test_vector.cpp",
+  "file": "/Users/wangziyi/Desktop/test_cpp/wzy_stl/test/test_vector.cpp",
+  "output": "CMakeFiles/test_vector.dir/test/test_vector.cpp.o"
+}
+]

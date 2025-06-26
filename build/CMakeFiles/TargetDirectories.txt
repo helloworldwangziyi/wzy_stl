@@ -1,0 +1,6 @@
+/Users/wangziyi/Desktop/test_cpp/wzy_stl/build/CMakeFiles/wzy_stl.dir
+/Users/wangziyi/Desktop/test_cpp/wzy_stl/build/CMakeFiles/test_deque.dir
+/Users/wangziyi/Desktop/test_cpp/wzy_stl/build/CMakeFiles/test_util.dir
+/Users/wangziyi/Desktop/test_cpp/wzy_stl/build/CMakeFiles/test_vector.dir
+/Users/wangziyi/Desktop/test_cpp/wzy_stl/build/CMakeFiles/edit_cache.dir
+/Users/wangziyi/Desktop/test_cpp/wzy_stl/build/CMakeFiles/rebuild_cache.dir

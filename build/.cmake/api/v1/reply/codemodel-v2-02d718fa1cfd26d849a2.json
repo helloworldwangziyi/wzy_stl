@@ -1,0 +1,87 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "wzy_stl",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "test_deque::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-test_deque-Debug-e50371461fb2b0a9ff04.json",
+					"name" : "test_deque",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "test_util::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-test_util-Debug-15ebaeeb814ff7d5e570.json",
+					"name" : "test_util",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "test_vector::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-test_vector-Debug-aa2633e49ff4fcf76544.json",
+					"name" : "test_vector",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "wzy_stl::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-wzy_stl-Debug-cc515b00f674df9d9acf.json",
+					"name" : "wzy_stl",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/wangziyi/Desktop/test_cpp/wzy_stl/build",
+		"source" : "/Users/wangziyi/Desktop/test_cpp/wzy_stl"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 8
+	}
+}
