@@ -33,5 +33,36 @@ int main()
     std::cout << "a: " << a << std::endl;
     std::cout << "b: " << b << std::endl;
 
+    // ##########################测试swap_range##########################
+    int arr1[] = {1, 2, 3, 4, 5};
+    int arr2[] = {6, 7, 8, 9, 10};
+    wzy_stl::swap_range(arr1, arr1 + 5, arr2);
+    for(int i = 0; i < 5; ++i)
+    {
+        std::cout << arr1[i] << " ";
+    }
+    std::cout << std::endl;
+    for(int i = 0; i < 5; ++i)
+    {
+        std::cout << arr2[i] << " ";
+    }
+    std::cout << std::endl;
+
+    wzy_stl::swap(arr1, arr2);
+    for(int i = 0; i < 5; ++i)
+    {
+        std::cout << arr1[i] << " ";
+    }
+    std::cout << std::endl;
+    for(int i = 0; i < 5; ++i)
+    {
+        std::cout << arr2[i] << " ";
+    }
+    std::cout << std::endl;
+
+
+    // ##########################测试pair##########################
+    wzy_stl::pair<int, double> p1;
+
     return 0;
 }

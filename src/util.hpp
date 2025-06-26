@@ -48,6 +48,45 @@ ForwardIter2 swap_range(ForwardIter1 first1, ForwardIter1 last1, ForwardIter2 fi
     return first2;
 }
 
+template<typename T, size_t N>
+void swap(T(&a)[N], T(&b)[N])
+{
+    wzy_stl::swap_range(a, a + N, b);
+}
+
+
+// 结构体模板 pair 
+// 两个模板参数分别表示两个数据的类型
+// 用first 和 second 来分别取出第一个和第二个数据
+template<typename T1, typename T2>
+struct pair
+{
+    typedef T1 first_type;
+    typedef T2 second_type;
+
+    first_type first;
+    second_type second;
+
+    // default constructiable
+    // c++11 enable_if
+    // template <class Other1 = T1, class Other2 = T2,
+    //     typename = typename std::enable_if<
+    //     std::is_default_constructible<Other1>::value &&
+    //     std::is_default_constructible<Other2>::value, void>::type>
+    //     constexpr pair()
+    //     : first(), second()
+    // {
+    // }
+
+    // default constructiable
+    // c++20 新标准 concept
+    template<class Other1 = T1, class Other2 = T2>
+    requires std::is_default_constructible_v<Other1> && std::is_default_constructible_v<Other2>
+    constexpr pair() : first(), second()
+    {
+    }
+
+};
 
 }
 
