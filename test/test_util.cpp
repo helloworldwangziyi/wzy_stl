@@ -16,5 +16,17 @@ int main()
     std::cout << "a is lvalue reference: " << std::is_lvalue_reference<decltype(a)>::value << std::endl;
     std::cout << "b is lvalue reference: " << std::is_lvalue_reference<decltype(b)>::value << std::endl;
 
+    // 测试forward
+    int c = 3;
+    int& d = c;
+    int&& e = 4;
+    wzy_stl::forward<int>(c);
+    wzy_stl::forward<int&>(d);
+    wzy_stl::forward<int&&>(e);
+
+    std::cout << "c: " << c << std::endl;
+    std::cout << "d: " << d << std::endl;
+    std::cout << "e: " << e << std::endl;
+
     return 0;
 }
