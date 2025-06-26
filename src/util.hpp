@@ -30,6 +30,25 @@ constexpr T&& forward(typename std::remove_reference<T>::type &&arg) noexcept
     return static_cast<T&&>(arg);
 }
 
+template<typename T>
+void swap(T& lhs, T& rhs)
+{
+    auto tmp(wzy_stl::move(lhs));
+    lhs = wzy_stl::move(rhs);
+    rhs = wzy_stl::move(tmp);
+}
+
+template<typename ForwardIter1, typename ForwardIter2>
+ForwardIter2 swap_range(ForwardIter1 first1, ForwardIter1 last1, ForwardIter2 first2)
+{
+    for(; first1 != last1; ++first1, (void)++first2)
+    {
+        wzy_stl::swap(*first1, *first2);
+    }
+    return first2;
+}
+
+
 }
 
 
