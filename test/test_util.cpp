@@ -1,6 +1,14 @@
 #include <iostream>
 #include "../src/util.hpp"
 
+struct A {
+    explicit A(int) {} // 只能显式转换
+};
+
+struct B {
+    B(double) {} // 可以隐式转换
+};
+
 
 int main()
 {
@@ -63,6 +71,16 @@ int main()
 
     // ##########################测试pair##########################
     wzy_stl::pair<int, double> p1;
+    std::cout << "p1.first: " << p1.first << std::endl;
+    std::cout << "p1.second: " << p1.second << std::endl;
+    wzy_stl::pair<int, double> p2(1, 'a');
+    std::cout << "p2.first: " << p2.first << std::endl;
+    std::cout << "p2.second: " << p2.second << std::endl;
 
+    wzy_stl::pair<A, B> p3(A(1), 2.0);
+    wzy_stl::pair<A, B> p4(1, 2.0);
+    // wzy_stl::pair<A, B> p5 = {1, 2.0}; // 编译错误 编译器会尝试用 {1, 2.0} 去初始化 pair<A, B>，这时需要一个非 explicit的合适构造函数。
+    wzy_stl::pair<A, B> p5 = {A(1), 2.0};
+ 
     return 0;
 }

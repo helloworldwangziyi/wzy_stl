@@ -86,6 +86,46 @@ struct pair
     {
     }
 
+    // c++14 enable_if_t 允许隐式转换
+    // template<typename U1 = T1, typename U2 = T2,
+    // typename std::enable_if_t<
+    // std::is_copy_constructible<U1>::value && 
+    // std::is_copy_constructible<U2>::value && 
+    // (std::is_convertible<const U1&, T1>::value &&
+    // std::is_convertible<const U2&, T2>::value), int> = 0>
+    // constexpr pair(const U1& x, const U2& y) : first(x), second(y)
+    // {
+    // }
+
+    // c++20 新标准 concept requires 允许隐式转换
+    template<class Other = T1, class Other2 = T2>
+    requires std::is_constructible_v<T1, Other> && 
+    std::is_constructible_v<T2, Other2> && 
+    (std::is_convertible<const Other&, T1>::value &&
+    std::is_convertible<const Other2&, T2>::value)
+    constexpr pair(const Other& x, const Other2& y) : first(x), second(y)
+    {
+    }
+
+    // c++14 新标准 不允许隐式转换
+    // template<typename U1 = T1, typename U2 = T2, 
+    // typename std::enable_if_t<
+    // std::is_copy_constructible_v<U1> &&
+    // std::is_copy_constructible_v<U2> && 
+    // (!std::is_convertible<const U1&, T1>::value || !std::is_convertible<const U2&, T2>::value), int> = 0>
+    // explicit constexpr pair(const U1& x, const U2& y) : first(x), second(y)
+    // {
+    // }
+
+    // c++20 新标准 concept requires 不允许隐式转换
+    template<class Other = T1, class Other2 = T2>
+    requires std::is_constructible_v<T1, Other> && 
+    std::is_constructible_v<T2, Other2> && 
+    (!std::is_convertible<const Other&, T1>::value || !std::is_convertible<const Other2&, T2>::value)
+    explicit constexpr pair(const Other& x, const Other2& y) : first(x), second(y)
+    {
+    }
+
 };
 
 }
