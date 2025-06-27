@@ -126,6 +126,57 @@ struct pair
     {
     }
 
+
+    // c++14 支持临时对象直接构造（完美转发） 隐式转换
+    // template<typename U1, typename U2,
+    // typename std::enable_if_t<
+    // std::is_constructible<T1, U1>::value &&
+    // std::is_constructible<T2, U2>::value &&
+    // std::is_convertible<U1&&, T1>::value &&
+    // std::is_convertible<U2&&, T2>::value,
+    // int> = 0>
+    // constexpr pair(U1&& x, U2&& y) : first(wzy_stl::forward<U1>(x)), second(wzy_stl::forward<U2>(y))
+    // {
+    // }
+
+    // c++20 新标准 concept requires 支持临时对象直接构造（完美转发） 隐式转换
+    template<class Other = T1, class Other2 = T2>
+    requires std::is_constructible_v<T1, Other> && 
+    std::is_constructible_v<T2, Other2> && 
+    std::is_convertible_v<Other&&, T1> &&
+    std::is_convertible_v<Other2&&, T2>
+    constexpr pair(Other&& x, Other2&& y) : first(wzy_stl::forward<Other>(x)), second(wzy_stl::forward<Other2>(y))
+    {
+
+    }
+
+    // c++14 支持临时对象直接构造（完美转发） 非隐式转换
+    // template<typename U1 = T1, typename U2 = T2, 
+    // typename std::enable_if_t<
+    // std::is_constructible_v<U1, T1> && 
+    // std::is_constructible_v<U2, T2> && 
+    // (!std::is_convertible_v<U1&& , T1> ||
+    // !std::is_convertible_v<U2&&, T2>),int> = 0>
+    // explicit constexpr pair(U1&& x, U2&& y) : first(wzy_stl::forward<U1>(x)), second(wzy_stl::forward<U2>(y))
+    // {
+       
+    // }
+
+    // c++20 新标准 concept requires 支持临时对象直接构造（完美转发） 非隐式转换
+    template<class Other = T1, class Other2 = T2>
+    requires std::is_constructible_v<T1, Other> && 
+    std::is_constructible_v<T2, Other2> && 
+    (!std::is_convertible_v<Other&&, T1> ||
+    !std::is_convertible_v<Other2&&, T2>)
+    explicit constexpr pair(Other&& x, Other2&& y) : first(wzy_stl::forward<Other>(x)), second(wzy_stl::forward<Other2>(y))
+    {
+
+    }
+
+
+
+    pair(const pair& rhs) = default;
+    pair(pair&& rhs) = default;
 };
 
 }
