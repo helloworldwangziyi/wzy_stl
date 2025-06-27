@@ -2,11 +2,17 @@
 #include "../src/util.hpp"
 
 struct A {
-    explicit A(int) {} // 只能显式转换
+    explicit A(int) {std::cout << "A(int)" << std::endl;} // 只能显式转换
+    A(){std::cout << "A() default construct" << std::endl;}
+    A(const A&){std::cout << "A(const A&)" << std::endl;}
+    A(A&&){std::cout << "A(A&&)" << std::endl;}
 };
 
 struct B {
-    B(double) {} // 可以隐式转换
+    B(double) {std::cout << "B(double)" << std::endl;} // 可以隐式转换
+    B(){std::cout << "B() default construct" << std::endl;}
+    B(const B&){std::cout << "B(const B&)" << std::endl;}
+    B(B&&){std::cout << "B(B&&)" << std::endl;}
 };
 
 
@@ -81,6 +87,9 @@ int main()
     wzy_stl::pair<A, B> p4(1, 2.0);
     // wzy_stl::pair<A, B> p5 = {1, 2.0}; // 编译错误 编译器会尝试用 {1, 2.0} 去初始化 pair<A, B>，这时需要一个非 explicit的合适构造函数。
     wzy_stl::pair<A, B> p5 = {A(1), 2.0};
+
+    wzy_stl::pair<A, B> p6 = {A(), B()};
+
  
     return 0;
 }

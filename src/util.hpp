@@ -173,10 +173,78 @@ struct pair
 
     }
 
-
-
     pair(const pair& rhs) = default;
     pair(pair&& rhs) = default;
+
+    // c++14 支持拷贝构造
+    // template<typename U1 = T1, typename U2 = T2,
+    // typename std::enable_if_t<
+    // std::is_constructible_v<T1, const U1&> && 
+    // std::is_constructible_v<T2, const U2&> &&
+    // std::is_convertible_v<const U1&, T1> &&
+    // std::is_convertible_v<const U2&, T2>, int > = 0>
+    // constexpr pair(const pair<U1, U2> & other): first(other.first), second(other.second)
+    // {
+
+    // }
+
+    // c++20 新标准 concept requires 支持拷贝构造 隐式转换
+    template<class Other = T1, class Other2 = T2>
+    requires std::is_constructible_v<T1, const Other&> &&
+    std::is_constructible_v<T2, const Other2&> &&
+    std::is_convertible_v<const Other&, T1> &&
+    std::is_convertible_v<const Other2&, T2>
+    constexpr pair(const pair<Other, Other2>& other) : first(other.first), second(other.second)
+    {
+
+    }
+
+    // c++14 支持拷贝构造 非隐式转换
+    // template<typename U1 = T1, typename U2 = T2,
+    // typename std::enable_if_t<
+    // std::is_constructible_v<T1, const U1&> && 
+    // std::is_constructible_v<T2, const U2&> &&
+    // (!std::is_convertible_v<const U1&, T1> ||
+    // !std::is_convertible_v<const U2&, T2>), int > = 0>
+    // explicit constexpr pair(const pair<U1, U2> & other): first(other.first), second(other.second)
+    // {
+    // }
+
+    // c++20 新标准 concept requires 支持拷贝构造 隐式转换
+    template<class Other = T1, class Other2 = T2>
+    requires std::is_constructible_v<T1, const Other&> &&
+    std::is_constructible_v<T2, const Other2&> &&
+    (!std::is_convertible_v<const Other&, T1> ||
+    !std::is_convertible_v<const Other2&, T2>)
+    explicit constexpr pair(const pair<Other, Other2>& other) : first(other.first), second(other.second)
+    {
+
+    }
+
+    // c++14 支持移动构造 隐式转换
+    // template<typename U1 = T1, typename U2 = T2,
+    // typename std::enable_if_t<
+    // std::is_constructible_v<T1, U1&&> && 
+    // std::is_constructible_v<T2, U2&&> &&
+    // std::is_convertible_v<U1&&, T1> &&
+    // std::is_convertible_v<U2&&, T2>, int > = 0>
+    // constexpr pair(pair<U1, U2> && other): first(wzy_stl::forward<U1>(other.first)), second(wzy_stl::forward<U2>(other.second))
+    // {
+    // }
+
+    // c++20 新标准 concept requires 支持移动构造 非隐式转换
+    template<class Other = T1, class Other2 = T2>
+    requires std::is_constructible_v<T1, Other&&> &&
+    std::is_constructible_v<T2, Other2&&> &&
+    (!std::is_convertible_v<Other&&, T1> ||
+    !std::is_convertible_v<Other2&&, T2>)
+    explicit constexpr pair(pair<Other, Other2> && other) : first(wzy_stl::forward<Other>(other.first)), second(wzy_stl::forward<Other2>(other.second))
+    {
+
+    }
+
+
+
 };
 
 }
