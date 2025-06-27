@@ -87,9 +87,22 @@ int main()
     wzy_stl::pair<A, B> p4(1, 2.0);
     // wzy_stl::pair<A, B> p5 = {1, 2.0}; // 编译错误 编译器会尝试用 {1, 2.0} 去初始化 pair<A, B>，这时需要一个非 explicit的合适构造函数。
     wzy_stl::pair<A, B> p5 = {A(1), 2.0};
-
     wzy_stl::pair<A, B> p6 = {A(), B()};
 
+    // 拷贝构造
+    wzy_stl::pair<int, double> p7(p2);
+    std::cout << "p7.first: " << p7.first << std::endl;
+    std::cout << "p7.second: " << p7.second << std::endl;
+
+    // 移动构造
+    wzy_stl::pair<int, double> p8(wzy_stl::move(p2));
+    std::cout << "p8.first: " << p8.first << std::endl;
+    std::cout << "p8.second: " << p8.second << std::endl;
+
+    // 拷贝赋值
+    wzy_stl::pair<int, double> p9 = p2;
+    std::cout << "p9.first: " << p9.first << std::endl;
+    std::cout << "p9.second: " << p9.second << std::endl;
  
     return 0;
 }
