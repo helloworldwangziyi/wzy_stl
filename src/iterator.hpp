@@ -200,6 +200,45 @@ distance(InputIterator first, InputIterator last)
     return distance_dispatch(first, last, iterator_category(first));
 }
 
+// 以下函数用于让迭代器前进n个位置
+template<class InputIterator, class Distance>
+void advance_dispatch(InputIterator& it, Distance n, input_iterator_tag)
+{
+    while(n--)
+    {
+        ++it;
+    }
+}
+
+template<class RandomIter, class Distance>
+void advance_dispatch(RandomIter& it, Distance n, random_access_iterator_tag)
+{
+    it += n;
+}
+
+template<class InputIterator, class Distance>
+void advance(InputIterator& it, Distance n)
+{
+    advance_dispatch(it, n, iterator_category(it));
+}
+
+template<class Iterator>
+class reverse_iterator{
+private:
+    Iterator current; // 记录对应的正向迭代器
+public:
+    // 反向迭代器的五种相应类别
+    typedef typename iterator_traits<Iterator>::iterator_category iterator_category;
+    typedef typename iterator_traits<Iterator>::value_type value_type;
+    typedef typename iterator_traits<Iterator>::difference_type difference_type;
+    typedef typename iterator_traits<Iterator>::pointer pointer;
+    typedef typename iterator_traits<Iterator>::reference reference;
+
+    typedef Iterator iterator_type; 
+    typedef reverse_iterator<Iterator> self;
+};
+
+
 
 }
 
