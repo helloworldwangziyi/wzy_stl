@@ -94,6 +94,27 @@ OutputIter unchecked_copy(InputIter first, InputIter last, OutputIter result)
     return unchecked_copy_cat(first, last, result, wzy_stl::iterator_category(first));
 }
 
+template<class Tp, class Up>
+concept TriviallyCopyable = std::is_same_v<typename std::remove_const<Tp>::type, Up> &&
+                            std::is_trivially_copy_assignable<Up>::value;
+
+template<class Tp, class Up>
+        requires TriviallyCopyable<Tp, Up>
+Up* unchecked_copy(Tp* first, Tp* last, Up* result)
+{
+    const auto n = static_cast<size_t>(last - first);
+    if(n != 0)
+      std::memmove(result, first, n * sizeof(Tp));
+    return result + n;
+}
+
+template<class InputIter,class OutputIter>
+OutputIter copy(InputIter first, InputIter last, OutputIter result)
+{
+  return unchecked_copy(first, last, result);
+}
+
+
 
 }
 
