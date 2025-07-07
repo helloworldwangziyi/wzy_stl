@@ -17,13 +17,13 @@ typename std::remove_reference<T>::type&& move(T&& arg) noexcept
 
 // forward
 template<typename T>
-constexpr T&& forward(typename std::remove_reference<T>::type& arg) noexcept
+T&& forward(typename std::remove_reference<T>::type& arg) noexcept
 {
     return static_cast<T&&>(arg);
 }
 
 template<typename T>
-constexpr T&& forward(typename std::remove_reference<T>::type &&arg) noexcept
+T&& forward(typename std::remove_reference<T>::type &&arg) noexcept
 {
     static_assert(!std::is_lvalue_reference<T>::value, "template argument"
     " substituting T is an lvalue reference type");
