@@ -114,7 +114,43 @@ OutputIter copy(InputIter first, InputIter last, OutputIter result)
   return unchecked_copy(first, last, result);
 }
 
+/*****************************************************************************************/
+// copy_backward
+// 将 [first, last)区间内的元素拷贝到 [result - (last - first), result)内
+/*****************************************************************************************/
+// unchecked_copy_backward_cat 的 bidirectional_iterator_tag 版本
 
+/*****************************************************************************************/
+// copy_n
+// 把 [first, first + n)区间上的元素拷贝到 [result, result + n)上
+// 返回一个 pair 分别指向拷贝结束的尾部
+/*****************************************************************************************/
+template<class InputIter, class Size, class OutputIter>
+wzy_stl::pair<InputIter, OutputIter>
+unchecked_copy_n(InputIter first, Size n , OutputIter result, wzy_stl::input_iterator_tag)
+{
+  for(; n > 0; --n; ++first, ++result)
+  {
+    *result = *first;
+  }
+  return wzy_stl::pair<InputIter, OutputIter>(first, result);
+}
+
+template <class RandomIter, class Size, class OutputIter>
+wzy_stl::pair<RandomIter, OutputIter>
+unchecked_copy_n(RandomIter first, Size n, OutputIter result, 
+                 wzy_stl::random_access_iterator_tag)
+{
+  auto last = first + n;
+  return wzy_stl::pair<RandomIter, OutputIter>(last, wzy_stl::copy(first, last, result));
+}
+
+template <class InputIter, class Size, class OutputIter>
+wzy_stl::pair<InputIter, OutputIter> 
+copy_n(InputIter first, Size n, OutputIter result)
+{
+  return unchecked_copy_n(first, n, result, iterator_category(first));
+}
 
 }
 
