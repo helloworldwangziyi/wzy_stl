@@ -120,6 +120,55 @@ OutputIter copy(InputIter first, InputIter last, OutputIter result)
 /*****************************************************************************************/
 // unchecked_copy_backward_cat 的 bidirectional_iterator_tag 版本
 
+template <class BidirectionalIter1, class BidirectionalIter2>
+BidirectionalIter2
+unchecked_copy_backward_cat(BidirectionalIter1 first, BidirectionalIter1 last,
+                            BidirectionalIter2 result, wzy_stl::bidirectional_iterator_tag)
+{
+  while(first != last)
+  {
+    *(--result) = *(--last);
+  }
+  return result;
+}
+
+// random_access_iterator_tag 版本
+template <class RandomIter1, class BidirectionalIter2>
+BidirectionalIter2
+unchecked_copy_backward_cat(RandomIter1 first, RandomIter1 last, 
+                            BidirectionalIter2 result, wzy_stl::random_access_iterator_tag)
+{
+  for(auto n = last - first; n > 0; n--)
+  {
+    *(--result) = *(--last);
+  }
+  return result;
+}
+
+template <class BidIterectionalIter1, class BidIterectionalIter2>
+BidIterectionalIter2
+unchecked_copy_backward(BidIterectionalIter1 first, BidIterectionalIter1 last, BidIterectionalIter2 result)
+{
+  return unchecked_copy_backward_cat(first, last, result, wzy_stl::iterator_category(first));
+}
+
+// 为平凡拷贝提供特化版本
+template <class Tp, class Up>
+concept Trivially_copyable = std::is_same_v<typename std::remove_const<Tp>::type, Up> && std::is_trivially_copy_assignable<Up>::value;
+
+template <class Tp, class Up>
+requires Trivially_copyable<Tp, Up>
+Up* unchecked_copy_backward(Tp* first, Tp* last, Up* result)
+{
+  const auto n = static_cast<size_t>(last - first);
+  if(n != 0)
+  {
+    result -= n;
+    std::memmove(result, first, n * sizeof(Up));
+  }
+  return result;
+}
+
 /*****************************************************************************************/
 // copy_n
 // 把 [first, first + n)区间上的元素拷贝到 [result, result + n)上
@@ -129,7 +178,7 @@ template<class InputIter, class Size, class OutputIter>
 wzy_stl::pair<InputIter, OutputIter>
 unchecked_copy_n(InputIter first, Size n , OutputIter result, wzy_stl::input_iterator_tag)
 {
-  for(; n > 0; --n; ++first, ++result)
+  for(; n > 0; --n, ++first, ++result)
   {
     *result = *first;
   }
