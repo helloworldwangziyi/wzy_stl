@@ -228,16 +228,6 @@ copy_n(InputIter first, Size n, OutputIter result)
                                         typename iterator_traits<InputIter>::
                                         value_type>{});
 }
-/*****************************************************************************************/
-// uninitialized_fill
-// 在 [first, last) 区间内填充元素值
-/*****************************************************************************************/
-template<class ForwardIter, class T>
-void
-unchecked_uninit_fill(ForwardIter first, ForwardIter last, const T& value, std::true_type)
-{
-  wzy_stl::fill(first, last, value);
-}
 
 /*****************************************************************************************/
 // move
@@ -277,21 +267,6 @@ unchecked_move(InputIter first, InputIter last, OutputIter result)
   return unchecked_move_cat(first, last, result, iterator_category(first));
 }
 
-// 为 trivially_copy_assignable 类型提供特化版本
-template <class Tp, class Up>
-concept Trivially_moveable = std::is_same_v<typename std::remove_const<Tp>::type, Up> && std::is_trivially_move_assignable<Up>::value;
-
-template <class Tp, class Up>
-requires Trivially_moveable<Tp, Up>
-Up* unchecked_move(Tp* first, Tp* last, Up* result)
-{
-  const auto n = static_cast<size_t>(last - first);
-  if(n != 0)
-  {
-    std::memmove(result, first, n * sizeof(Up));
-  }
-  return result + n;
-}
 
 template <class InputIter, class OutputIter>
 OutputIter
