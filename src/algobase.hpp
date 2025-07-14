@@ -127,9 +127,9 @@ OutputIter copy(InputIter first, InputIter last, OutputIter result)
 /*****************************************************************************************/
 template<class InputIter, class Size, class OutputIter>
 wzy_stl::pair<InputIter, OutputIter>
-unchecked_copy_n(InputIter first, Size n , OutputIter result, wzy_stl::input_iterator_tag)
+unchecked_uninit_copy_n(InputIter first, Size n , OutputIter result, wzy_stl::input_iterator_tag)
 {
-  for(; n > 0; --n; ++first, ++result)
+  for(; n > 0; --n, ++first, ++result)
   {
     *result = *first;
   }
@@ -138,7 +138,7 @@ unchecked_copy_n(InputIter first, Size n , OutputIter result, wzy_stl::input_ite
 
 template <class RandomIter, class Size, class OutputIter>
 wzy_stl::pair<RandomIter, OutputIter>
-unchecked_copy_n(RandomIter first, Size n, OutputIter result, 
+unchecked_uninit_copy_n(RandomIter first, Size n, OutputIter result, 
                  wzy_stl::random_access_iterator_tag)
 {
   auto last = first + n;
@@ -149,7 +149,20 @@ template <class InputIter, class Size, class OutputIter>
 wzy_stl::pair<InputIter, OutputIter> 
 copy_n(InputIter first, Size n, OutputIter result)
 {
-  return unchecked_copy_n(first, n, result, iterator_category(first));
+  return wzy_stl::unchecked_uninit_copy_n(first, n, result,
+                                        std::is_trivially_copy_assignable<
+                                        typename iterator_traits<InputIter>::
+                                        value_type>{});
+}
+/*****************************************************************************************/
+// uninitialized_fill
+// 在 [first, last) 区间内填充元素值
+/*****************************************************************************************/
+template<class ForwardIter, class T>
+void
+unchecked_uninit_fill(ForwardIter first, ForwardIter last, const T& value, std::true_type)
+{
+  wzy_stl::fill(first, last, value);
 }
 
 }
