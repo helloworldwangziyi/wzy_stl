@@ -84,4 +84,6 @@ unchecked_uninit_copy_n(InputIter first, Size n, ForwardIter result, std::false_
 
 
 
+}  // namespace wzy_stl
+
 #endif // WZY_STL_UNINITIALIZED_HPP
