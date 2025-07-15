@@ -82,7 +82,53 @@ unchecked_uninit_copy_n(InputIter first, Size n, ForwardIter result, std::false_
     return cur;
 }
 
+template<class InputIter, class Size, class ForwardIter>
+ForwardIter
+uninitialized_copy_n(InputIter first, Size n, ForwardIter result)
+{
+    return wzy_stl::unchecked_uninit_copy_n(first, n, result,
+    std::is_trivially_copy_assignable<typename iterator_traits<ForwardIter>::value_type>{});
+}
 
+/*****************************************************************************************/
+// uninitialized_fill_n
+// 从 first 位置开始，填充 n 个元素值，返回填充结束的位置
+/*****************************************************************************************/
+template<class ForwardIter, class Size, class T>
+ForwardIter
+unchecked_uninit_fill_n(ForwardIter first, Size n, const T& value, std::true_type)
+{
+    return wzy_stl::fill_n(first, n, value);
+}
+
+template<class ForwardIter, class Size, class T>
+ForwardIter
+unchecked_uninit_fill_n(ForwardIter first, Size n, const T& value, std::false_type)
+{
+    auto cur = first;
+    try{
+        for(; n > 0; --n, ++cur)
+        {
+            wzy_stl::construct(&*cur, value);
+        }
+    }
+    catch(...)
+    {
+        for(; first != cur; ++first)
+        {
+            wzy_stl::destroy(&*first);
+        }
+    }
+    return cur;
+}
+
+template<class ForwardIter, class Size, class T>
+ForwardIter
+uninitialized_fill_n(ForwardIter first, Size n, const T& value)
+{
+    return wzy_stl::unchecked_uninit_fill_n(first, n, value,
+    std::is_trivially_copy_assignable<typename iterator_traits<ForwardIter>::value_type>{});
+}
 
 }  // namespace wzy_stl
 
