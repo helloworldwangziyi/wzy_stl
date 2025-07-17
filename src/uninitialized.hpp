@@ -46,7 +46,7 @@ template<class InputIter, class ForwardIter>
 ForwardIter 
 uninitialized_copy(InputIter first, InputIter last, ForwardIter result)
 {
-    return wzy_stl::uncheck_uninit_copy(first, last, result, std::is_trivially_copy_assignable<typename iterator_traits<ForwardIter>::value_type>{});
+    return wzy_stl::unchecked_uninit_copy(first, last, result, std::is_trivially_copy_assignable<typename iterator_traits<ForwardIter>::value_type>{});
 }
 
 /*****************************************************************************************/
@@ -213,7 +213,7 @@ template<class InputIter, class Size, class ForwardIter>
 ForwardIter
 unchecked_uninit_move_n(InputIter first, Size n, ForwardIter result, std::true_type)
 {
-    return wzy_stl::move_n(first, n, result);
+    return wzy_stl::move(first, n, result);
 }
 
 template<class InputIter, class Size, class ForwardIter>
