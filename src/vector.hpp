@@ -66,6 +66,12 @@ public:
 private:
     void try_init() noexcept; // 初始化
 
+    void init_space(size_type size, size_type cap);
+
+    void fill_init(size_type n, const value_type& value);
+
+    template <class Iter>
+    void range_init(Iter first, Iter last);
 
 
 };
@@ -86,6 +92,43 @@ void vector<T>::try_init() noexcept
         end_ = nullptr;
         cap_ = nullptr;
     }   
+}
+
+template <class T>
+void vector<T>::init_space(size_type size, size_type cap)
+{
+    try
+    {
+        begin_ = data_allocator::allocate(cap);
+        end_ = begin_ + size;
+        cap_ = begin_ + cap;
+    }
+    catch(...)
+    {
+        begin_ = nullptr;
+        end_ = nullptr;
+        cap_ = nullptr;
+        throw;
+    }
+    
+}
+
+template <class T>
+void vector<T>::fill_init(size_type n, const value_type& value)
+{
+    const size_type init_size = wzy_stl::max(static_cast<size_type>(16, n));
+    init_space(n , init_size);
+    wzy_stl::uninitialized_fill_n(begin_, n , value);
+}
+
+template <class T>
+template <class Iter>
+void vector<T>::range_init(Iter first, Iter last)
+{
+    const size_type len = wzy_stl::distance(first, last);
+    const size_type init_size = wzy_stl::max(len, static_cast<size_type>(16));
+    init_space(len, init_size);
+    wzy_stl::uninitialized_copy(first, last, begin_);
 }
 
 
