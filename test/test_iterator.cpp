@@ -92,6 +92,8 @@ int main()
     int arr[] = {1, 2, 3, 4, 5};
     MyIter my_it(arr);
     std::cout << "distance(my_it, my_it + 5) = " << distance(my_it, my_it + 5) << std::endl;
+    // 原生指针偏特化萃取为随机访问迭代器
+    std::cout << "distance(my_it, my_it + 5) = " << distance(arr, arr + 5) << std::endl;
     std::cout << "my_it = " << *my_it << std::endl;
     advance(my_it, 2);
     // advance(my_it, 1000); 未定义行为 数组越界
