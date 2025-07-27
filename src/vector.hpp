@@ -63,6 +63,11 @@ public:
         fill_init(n, value_type());
     }
 
+    vector(size_type n, const value_type& value)
+    {
+        fill_init(n ,value);
+    }
+
 private:
     void try_init() noexcept; // 初始化
 
