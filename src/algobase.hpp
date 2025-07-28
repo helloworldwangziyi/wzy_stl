@@ -6,7 +6,7 @@
 #include "iterator.hpp"
 #include "util.hpp"
 
-namespace wzy_stl{
+
 
 #ifdef max
 #pragma message("#undefing marco max")
@@ -17,6 +17,9 @@ namespace wzy_stl{
 #pragma message("#undefing marco min")
 #undef min
 #endif // min
+
+
+namespace wzy_stl{
 
 /*****************************************************************************************/
 // max

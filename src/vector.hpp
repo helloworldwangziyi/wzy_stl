@@ -8,8 +8,8 @@
 #include "memory.hpp"
 #include "util.hpp"
 #include "exceptdef.hpp"
+#include "algobase.hpp"
 #include "algo.hpp"
-
 
 namespace wzy_stl
 {
@@ -68,6 +68,202 @@ public:
         fill_init(n ,value);
     }
 
+    template <class Iter, typename std::enable_if<wzy_stl::is_input_iterator<Iter>::value, int>::type = 0>
+    vector(Iter first, Iter last)
+    {
+        WZY_DEBUG(!(last < first));
+        range_init(first, last);
+    }
+
+    vector(const vector& other)
+    {
+        range_init(other.begin_, other.end_);
+    }
+
+    // 移动构造函数
+    vector(vector&& other) noexcept
+    :begin_(other.begin_),
+    end_(other.end_),
+    cap_(other.cap_)
+    {
+        other.begin_ = nullptr;
+        other.end_ = nullptr;
+        other.cap_ = nullptr;
+    }
+
+    vector(std::initializer_list<value_type> ilist)
+    {
+        range_init(ilist.begin(), ilist.end());
+    }
+
+    vector& operator=(const vector& other);
+    vector& operator=(vector&& other) noexcept;
+
+    vector& operator=(std::initializer_list<value_type> ilist)
+    {
+        vector tmp(ilist.begin(), ilist.end());
+        swap(tmp);
+        return *this;
+    }
+
+    ~vector()
+    {
+        destroy_and_recover(begin_, end_, cap_ - begin_);
+        begin_ = end_ = cap_ = nullptr;
+    }
+
+public:
+
+    // 迭代器相关的操作
+    iterator begin() noexcept
+    {
+        return begin_;
+    }
+
+    const_iterator begin() const noexcept
+    {
+        return begin_;
+    }
+
+    iterator end() noexcept
+    {
+        return end_;
+    }
+
+    const_iterator end() const noexcept
+    {
+        return end_;
+    }
+
+    // 反向迭代器
+    reverse_iterator rbegin() noexcept
+    {
+        return reverse_iterator(end());
+    }
+
+    const_reverse_iterator rbegin() const noexcept
+    {
+        return const_reverse_iterator(end());
+    }
+
+    reverse_iterator rend() noexcept
+    {
+        return reverse_iterator(begin());
+    }
+
+    const_reverse_iterator rend() const noexcept
+    {
+        return const_reverse_iterator(begin());
+    }
+
+    const_iterator cbegin() const noexcept
+    {
+        return begin();
+    }
+
+    const_iterator cend() const noexcept
+    {
+        return end();
+    }
+
+    const_reverse_iterator crbegin() const noexcept
+    {
+        return rbegin();
+    }
+
+    const_reverse_iterator crend() const noexcept
+    {
+        return rend();
+    }
+
+    // 容量相关操作
+    bool empty() const noexcept
+    {
+        return begin_ == end_;
+    }
+
+    size_type size() const noexcept
+    {
+        return static_cast<size_type>(end_ - begin_);
+    }
+
+    size_type max_size() const noexcept
+    {
+        return static_cast<size_type>(-1) / sizeof(T);
+    }
+
+    size_type capacity() const noexcept
+    {
+        return static_cast<size_type>(cap_ - begin_);
+    }
+
+    void reserve(size_type n);
+
+    void shrink_to_fit();
+
+    void swap(vector& other) noexcept;
+
+    // 访问元素相关操作
+    reference operator[](size_type n)
+    {
+        WZY_DEBUG(n < size());
+        return *(begin_ + n);
+    }
+
+    const_reference operator[](size_type n) const
+    {
+        WZY_DEBUG(n < size());
+        return *(begin_ + n);
+    }
+
+    reference at(size_type n)
+    {
+        WZY_THROW_OUT_OF_RANGE_IF(n >= size(), "n is out of range");
+        return (*this)[n];
+    }
+
+    const_reference at(size_type n) const
+    {
+        WZY_THROW_OUT_OF_RANGE_IF(n >= size(), "n is out of range");
+        return (*this)[n];
+    }
+
+    reference front()
+    {
+        WZY_DEBUG(!empty());
+        return *begin_;
+    }
+
+    const_reference front() const 
+    {
+        WZY_DEBUG(!empty());
+        return *begin_;
+    }
+
+    reference back()
+    {
+        WZY_DEBUG(!empty());
+        return *(end_ - 1);
+    }
+
+    const_reference back() const 
+    {
+        WZY_DEBUG(!empty());
+        return *(end_ - 1);
+    }
+    pointer data() noexcept
+    {
+        return begin_;
+    }
+
+    const_pointer data() const noexcept
+    {
+        return begin_;
+    }
+
+    // 修改容器相关操作
+    
+
 private:
     void try_init() noexcept; // 初始化
 
@@ -77,6 +273,8 @@ private:
 
     template <class Iter>
     void range_init(Iter first, Iter last);
+
+    void destroy_and_recover(iterator first, iterator last, size_type n);
 
 
 };
@@ -134,6 +332,44 @@ void vector<T>::range_init(Iter first, Iter last)
     const size_type init_size = wzy_stl::max(len, static_cast<size_type>(16));
     init_space(len, init_size);
     wzy_stl::uninitialized_copy(first, last, begin_);
+}
+
+template <class T>
+void vector<T>::destroy_and_recover(iterator first, iterator last, size_type n)
+{
+    // 先调用析构函数
+    data_allocator::destroy(first, last);
+    // 再释放内存
+    data_allocator::deallocate(first, n);
+}
+
+template<class T>
+void vector<T>::reserve(size_type n)
+{
+    if(capacity() < n)
+    {
+        WZY_THROW_LENGTH_ERROR_IF(n > max_size(), "n can't be greater than max_size()");
+        
+        const auto old_size = size();
+        auto tmp = data_allocator::allocate(n);
+        wzy_stl::uninitialized_move(begin_, end_, tmp);
+        data_allocator::deallocate(begin_, cap_ - begin_);
+        begin_ = tmp;
+        end_ = begin_ + old_size;
+        cap_ = begin_ + n;
+    }
+}
+
+
+template<class T>
+void vector<T>::swap(vector& other) noexcept
+{
+    if(this != &other)
+    {
+        wzy_stl::swap(begin_, other.begin_);
+        wzy_stl::swap(end_, other.end_);
+        wzy_stl::swap(cap_, other.cap_);
+    }
 }
 
 
