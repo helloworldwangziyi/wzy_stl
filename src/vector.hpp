@@ -197,11 +197,9 @@ public:
         return static_cast<size_type>(cap_ - begin_);
     }
 
-    void reserve(size_type n);
+    void reserve(size_type n); 
 
     void shrink_to_fit();
-
-    void swap(vector& other) noexcept;
 
     // 访问元素相关操作
     reference operator[](size_type n)
@@ -262,7 +260,28 @@ public:
     }
 
     // 修改容器相关操作
-    
+
+
+    // assign 操作
+    void assign(size_type n, const value_type& value)
+    {
+        fill_assign(n, value);
+    }
+
+
+    // erase / clear
+    iterator erase(const_iterator pos);
+    iterator erase(const_iterator first, const_iterator last);
+    void     clear() { erase(begin(), end()); }
+
+    // resize / reverse
+    void     resize(size_type new_size) { return resize(new_size, value_type()); }
+    void     resize(size_type new_size, const value_type& value);
+
+    void     reverse() { wzy_stl::reverse(begin(), end()); }
+
+    // 交换
+    void swap(vector& other) noexcept;
 
 private:
     void try_init() noexcept; // 初始化
@@ -276,7 +295,10 @@ private:
 
     void destroy_and_recover(iterator first, iterator last, size_type n);
 
+    // 计算成长空间
+    size_type get_new_cap(size_type add_size);
 
+    void fill_assign(size_type n, const value_type& value);
 };
 
 
@@ -343,6 +365,46 @@ void vector<T>::destroy_and_recover(iterator first, iterator last, size_type n)
     data_allocator::deallocate(first, n);
 }
 
+
+// get_new_cap 函数 vector 的扩容函数
+template <class T>
+typename vector<T>::size_type 
+vector<T>::
+get_new_cap(size_type add_size)
+{
+  const auto old_size = capacity();
+  THROW_LENGTH_ERROR_IF(old_size > max_size() - add_size,
+                        "vector<T>'s size too big");
+  if (old_size > max_size() - old_size / 2)
+  {
+    return old_size + add_size > max_size() - 16
+      ? old_size + add_size : old_size + add_size + 16;
+  }
+  const size_type new_size = old_size == 0
+    ? wzy_stl::max(add_size, static_cast<size_type>(16))
+    : wzy_stl::max(old_size + old_size / 2, old_size + add_size);
+  return new_size;
+}
+
+template <class T>
+void vector<T>::fill_assign(size_type n, const value_type& value)
+{
+    if(n > capacity())
+    {
+        vector tmp(n, value);
+        swap(tmp);
+    }
+    else if(n > size())
+    {
+        wzy_stl::fill(begin_, end_, value);
+        end_ = wzy_stl::uninitialized_fill_n(end_, n - size(), value);
+    }
+    else 
+    {
+        erase(wzy_stl::fill_n(begin_, n, value), end_);
+    }
+}
+
 template<class T>
 void vector<T>::reserve(size_type n)
 {
@@ -359,6 +421,33 @@ void vector<T>::reserve(size_type n)
         cap_ = begin_ + n;
     }
 }
+
+// 删除pos位置的元素
+template <class T>
+typename vector<T>::iterator
+vector<T>::erase(const_iterator pos)
+{
+    WZY_DEBUG(pos >= begin() && pos < end());
+    iterator xpos = begin_ + (pos - begin());
+    wzy_stl::move(xpos + 1, end_, xpos);
+    data_allocator::destroy(end_ - 1);
+    --end_;
+    return xpos;
+}
+
+// 删除[first, last)区间的元素
+template <class T>
+typename vector<T>::iterator
+vector<T>::erase(const_iterator first, const_iterator last)
+{
+    WZY_DEBUG(first >= begin() && last <= end() && !(last < first));
+    const auto n = first - begin();
+    iterator r = begin_ + (first - begin());
+    data_allocator::destroy(wzy_stl::move(r + (last - first), end_, r), end_);
+    end_ = end_ - (last - first);
+    return begin_ + n;
+}
+
 
 
 template<class T>
