@@ -268,6 +268,54 @@ public:
         fill_assign(n, value);
     }
 
+    template<class Iter, typename std::enable_if<wzy_stl::is_input_iterator<Iter>::value, int>::type = 0>
+    void assign(Iter first , Iter last)
+    {
+        WZY_DEBUG(!(last < first));
+        copy_assign(first, last, iterator_category(first));
+    }
+
+    void assign(std::initializer_list<value_type> il)
+    {
+        copy_assign(il.begin(), il.end(), wzy_stl::forward_iterator_tag{});
+    }
+
+    // emplace / emplace_back
+    template<class ...Args>
+    iterator emplace(const_iterator pos, Args&& ...args);
+
+    template<class ...Args>
+    iterator emplace_back(Args&& ...args);
+
+    // push_back / pop_back
+    void push_back(const value_type& value);
+    void push_back(value_type&& value)
+    {
+        emplace_back(wzy_stl::move(value));
+    }
+
+    void pop_back();
+
+    // insert
+    iterator insert(const_iterator pos, const value_type& value);
+    iterator insert(const_iterator pos, const value_type&& value)
+    {
+        return emplace(pos, wzy_stl::move(value));
+    }
+
+    iterator insert(const_iterator pos, size_type n, const value_type& value)
+    {
+        WZY_DEBUG(pos >= begin() && pos <= end());
+        return fill_insert(const_cast<iterator>(pos), n, value);
+    }
+
+    template <class Iter, typename std::enable_if<
+        wzy_stl::is_input_iterator<Iter>::value, int>::type = 0>
+    void insert(const_iterator pos, Iter first, Iter last)
+    {
+        WZY_DEBUG(pos >= begin() && pos <= end() && !(last < first));
+        copy_insert(const_cast<iterator>(pos), first, last);
+    }
 
     // erase / clear
     iterator erase(const_iterator pos);
@@ -299,6 +347,12 @@ private:
     size_type get_new_cap(size_type add_size);
 
     void fill_assign(size_type n, const value_type& value);
+
+    template<class Iter>
+    void copy_assign(Iter first, Iter last, input_iterator_tag);
+
+    template<class FIter>
+    void copy_assign(FIter first, FIter last, forward_iterator_tag);
 };
 
 
@@ -404,6 +458,53 @@ void vector<T>::fill_assign(size_type n, const value_type& value)
         erase(wzy_stl::fill_n(begin_, n, value), end_);
     }
 }
+
+// copy_assign 函数
+template <class T>
+template <class Iter>
+void vector<T>::copy_assign(Iter first, Iter last, input_iterator_tag)
+{
+    auto cur = begin_;
+    for(; first != last && cur != end_; ++first, ++cur)
+    {
+        *cur = *first;
+    }
+    if(first == last)
+    {
+        erase(cur, end_);
+    }
+    else
+    {
+        insert(end_, first, last);
+    }
+}
+
+template<class T>
+template<class FIter>
+void vector<T>::copy_assign(FIter first, FIter last, forward_iterator_tag)
+{
+    const size_type len = wzy_stl::distance(first, last);
+    if(len > capacity())
+    {
+        vector tmp(first , last);
+        swap(tmp);
+    } 
+    else if(size() >= len)
+    {
+        auto new_end = wzy_stl::copy(first, last, begin_);
+        data_allocator::destory(new_end, end_);
+        end_ = new_end;
+    }
+    else
+    {
+        auto mid = first;
+        wzy_stl::advance(mid, size());
+        wzy_stl::copy(first, mid, begin_);
+        auto new_end = wzy_stl::uninitialized_copy(mid, last, end_);
+        end_ = new_end;
+    }
+}
+
 
 template<class T>
 void vector<T>::reserve(size_type n)
