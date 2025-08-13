@@ -353,9 +353,106 @@ private:
 
     template<class FIter>
     void copy_assign(FIter first, FIter last, forward_iterator_tag);
+
+    // reallocate
+    template<class ...Args>
+    void reallocate_emplace(iterator pos, Args&& ...args);
+
+    void reallocate_insert(iterator pos, const value_type& value);
+
+    // insert 
+    iterator fill_insert(iterator pos, size_type n, const value_type& value);
+
+    template<class Iter>
+    void copy_insert(iterator pos, Iter first, Iter last);
+
+    void reinsert(size_type size);
 };
 
 
+
+
+
+template<class T>
+void vector<T>::reserve(size_type n)
+{
+    if(capacity() < n)
+    {
+        WZY_THROW_LENGTH_ERROR_IF(n > max_size(), "n can't be greater than max_size()");
+        
+        const auto old_size = size();
+        auto tmp = data_allocator::allocate(n);
+        wzy_stl::uninitialized_move(begin_, end_, tmp);
+        data_allocator::deallocate(begin_, cap_ - begin_);
+        begin_ = tmp;
+        end_ = begin_ + old_size;
+        cap_ = begin_ + n;
+    }
+}
+
+
+template<class T>
+void vector<T>::shrink_to_fit()
+{
+    if(end_ < cap_)
+    {
+        reinsert(size());
+    }
+}
+
+// 删除pos位置的元素
+template <class T>
+typename vector<T>::iterator
+vector<T>::erase(const_iterator pos)
+{
+    WZY_DEBUG(pos >= begin() && pos < end());
+    iterator xpos = begin_ + (pos - begin());
+    wzy_stl::move(xpos + 1, end_, xpos);
+    data_allocator::destroy(end_ - 1);
+    --end_;
+    return xpos;
+}
+
+// 删除[first, last)区间的元素
+template <class T>
+typename vector<T>::iterator
+vector<T>::erase(const_iterator first, const_iterator last)
+{
+    WZY_DEBUG(first >= begin() && last <= end() && !(last < first));
+    const auto n = first - begin();
+    iterator r = begin_ + (first - begin());
+    data_allocator::destroy(wzy_stl::move(r + (last - first), end_, r), end_);
+    end_ = end_ - (last - first);
+    return begin_ + n;
+}
+
+// 重置容器大小
+template <class T>
+void vector<T>::resize(size_type new_size, const value_type& value)
+{
+    if(new_size < size())
+    {
+        erase(begin() + new_size(), end());
+    }
+    else
+    {
+        insert(end(), new_size - size(), value);
+    }
+}
+
+template<class T>
+void vector<T>::swap(vector& other) noexcept
+{
+    if(this != &other)
+    {
+        wzy_stl::swap(begin_, other.begin_);
+        wzy_stl::swap(end_, other.end_);
+        wzy_stl::swap(cap_, other.cap_);
+    }
+}
+
+/*****************************************************************************************/
+// helper function
 template <class T>
 void vector<T>::try_init() noexcept
 {
@@ -505,64 +602,80 @@ void vector<T>::copy_assign(FIter first, FIter last, forward_iterator_tag)
     }
 }
 
+template<class T>
+template<class ...Args>
+void vector<T>::reallocate_emplace(iterator pos, Args&& ...args)
+{
+    const auto new_size = get_new_cap(1);
+    auto new_begin = data_allocator::allocate(new_size);
+    auto new_end = new_begin;
+    try{
+        new_end = wzy_stl::uninitialized_move(begin_, pos, new_begin);
+        data_allocator::construct(wzy_stl::address_of(*new_end), wzy_stl::forward<Args>(args)...);
+        ++new_end;
+        new_end = wzy_stl::uninitialized_move(pos, end_, new_end);
+    }
+    catch(...)
+    {
+        data_allocator::deallocate(new_begin, new_size);
+        throw;
+    }
+    destroy_and_recover(begin_, end_, cap_ - begin_);
+    begin_ = new_begin;
+    end_ = new_end;
+    cap_ = new_begin + new_size;
+}
+
+template <class T>
+void vector<T>::reallocate_insert(iterator pos, const value_type& value)
+{
+    const auto new_size = get_new_cap(1);
+    auto new_begin = data_allocator::allocate(new_size);
+    auto new_end = new_begin;
+    const value_type& value_copy = value;
+    try{
+        new_end = wzy_stl::uninitialized_move(begin_, pos, new_begin);
+        data_allocator::construct(wzy_stl::address_of(*new_end), value_copy);
+        ++new_end;
+        new_end = wzy_stl::uninitialized_move(pos, end_, new_end);
+    }
+    catch(...)
+    {
+        data_allocator::deallocate(new_begin, new_size);
+        throw;
+    }
+    destroy_and_recover(begin_, end_, cap_ - begin_);
+    begin_ = new_begin;
+    end_ = new_end;
+    cap_ = new_begin + new_size;
+}
+
 
 template<class T>
-void vector<T>::reserve(size_type n)
-{
-    if(capacity() < n)
-    {
-        WZY_THROW_LENGTH_ERROR_IF(n > max_size(), "n can't be greater than max_size()");
-        
-        const auto old_size = size();
-        auto tmp = data_allocator::allocate(n);
-        wzy_stl::uninitialized_move(begin_, end_, tmp);
-        data_allocator::deallocate(begin_, cap_ - begin_);
-        begin_ = tmp;
-        end_ = begin_ + old_size;
-        cap_ = begin_ + n;
-    }
-}
-
-// 删除pos位置的元素
-template <class T>
 typename vector<T>::iterator
-vector<T>::erase(const_iterator pos)
+vector<T>::fill_insert(iterator pos, size_type n, const value_type& value)
 {
-    WZY_DEBUG(pos >= begin() && pos < end());
-    iterator xpos = begin_ + (pos - begin());
-    wzy_stl::move(xpos + 1, end_, xpos);
-    data_allocator::destroy(end_ - 1);
-    --end_;
-    return xpos;
+    WZY_DEBUG(pos >= begin() && pos <= end());
+    const size_type xpos = pos - begin();
+    iterator new_pos = begin_ + xpos;
+    if(end_ + n > cap_)
+    {}
 }
-
-// 删除[first, last)区间的元素
-template <class T>
-typename vector<T>::iterator
-vector<T>::erase(const_iterator first, const_iterator last)
-{
-    WZY_DEBUG(first >= begin() && last <= end() && !(last < first));
-    const auto n = first - begin();
-    iterator r = begin_ + (first - begin());
-    data_allocator::destroy(wzy_stl::move(r + (last - first), end_, r), end_);
-    end_ = end_ - (last - first);
-    return begin_ + n;
-}
-
 
 
 template<class T>
-void vector<T>::swap(vector& other) noexcept
+template<class Iter>
+void vector<T>::copy_insert(iterator pos, Iter first, Iter last)
 {
-    if(this != &other)
-    {
-        wzy_stl::swap(begin_, other.begin_);
-        wzy_stl::swap(end_, other.end_);
-        wzy_stl::swap(cap_, other.cap_);
-    }
+
 }
 
 
+template<class T>
+void vector<T>::reinsert(size_type size)
+{
+
+}
 
 }
 
