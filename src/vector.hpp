@@ -655,11 +655,49 @@ template<class T>
 typename vector<T>::iterator
 vector<T>::fill_insert(iterator pos, size_type n, const value_type& value)
 {
-    WZY_DEBUG(pos >= begin() && pos <= end());
-    const size_type xpos = pos - begin();
-    iterator new_pos = begin_ + xpos;
-    if(end_ + n > cap_)
-    {}
+    if(n == 0)
+    {
+        return pos;
+    }
+    const size_type xpos = pos - begin_;
+    const value_type value_copy = value;
+    if(static_cast<size_type>(cap_ - end_) >= n) // 如果备用空间大于增加的空间
+    { 
+        const size_type after_elems = ends_ - pos_;
+        auto old_end = end_;
+        if(after_elems > n)
+        {
+            wzy_stl::uninitialized_copy(end_- n, end_, end_);
+            end_ += n;
+            wzy_stl::move_backward(pos, old_end - n, old_end);
+            wzy_stl::uninitialized_fill_n(pos, after_elems, value_copy);
+        }
+        else{
+            end_ = wzy_stl::uninitialized_fill_n(end_, n - after_elems, value_copy);
+            end_ = wzy_stl::uninitialized_move(pos, old_end, end_);
+            wzy_stl::uninitialized_fill_n(pos, after_elems, value_copy);
+        }
+    }
+    else{ // 如果备用空间小于增加的空间
+        const auto new_size = get_new_cap(n);
+        auto new_begin = data_allocator::allocate(new_size);
+        auto new_end = new_begin;
+        try{
+            new_end = wzy_stl::uninitialized_move(begin_, pos, new_begin);
+            new_end = wzy_stl::uninitialized_fill_n(new_end, n, value);
+            new_end = wzy_stl::uninitialized_move(pos, end_, new_end);
+        }
+        catch(...)
+        {
+            destroy_and_recover(new_begin, new_end, new_size);
+            throw;
+        }
+        data_allocator::deallocate(begin_, cap_ - begin_);
+        begin_ = new_begin
+        end_ = new_end;
+        cap_ = begin_ + new_size;
+    }
+    return begin_ + xpos;
 }
 
 
